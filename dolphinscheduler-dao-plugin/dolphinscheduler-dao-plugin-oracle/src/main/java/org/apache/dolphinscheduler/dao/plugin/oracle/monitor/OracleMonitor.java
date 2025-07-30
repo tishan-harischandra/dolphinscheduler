@@ -52,10 +52,11 @@ public class OracleMonitor implements DatabaseMonitor {
                 Statement pstmt = connection.createStatement()) {
 
             // Get maximum allowed sessions from V$RESOURCE_LIMIT
-            try (ResultSet rs1 = pstmt.executeQuery(
-                    "SELECT CURRENT_UTILIZATION, MAX_UTILIZATION, LIMIT_VALUE " +
-                    "FROM V$RESOURCE_LIMIT " +
-                    "WHERE RESOURCE_NAME = 'sessions'")) {
+            try (
+                    ResultSet rs1 = pstmt.executeQuery(
+                            "SELECT CURRENT_UTILIZATION, MAX_UTILIZATION, LIMIT_VALUE " +
+                                    "FROM V$RESOURCE_LIMIT " +
+                                    "WHERE RESOURCE_NAME = 'sessions'")) {
                 if (rs1.next()) {
                     // Set max connections to the limit value
                     long limitValue = rs1.getLong("LIMIT_VALUE");
@@ -68,16 +69,18 @@ public class OracleMonitor implements DatabaseMonitor {
             }
 
             // Get current number of sessions from V$SESSION
-            try (ResultSet rs2 = pstmt.executeQuery(
-                    "SELECT COUNT(*) AS session_count FROM V$SESSION")) {
+            try (
+                    ResultSet rs2 = pstmt.executeQuery(
+                            "SELECT COUNT(*) AS session_count FROM V$SESSION")) {
                 if (rs2.next()) {
                     monitorRecord.setThreadsConnections(rs2.getLong("session_count"));
                 }
             }
 
             // Get number of active sessions from V$SESSION
-            try (ResultSet rs3 = pstmt.executeQuery(
-                    "SELECT COUNT(*) AS active_count FROM V$SESSION WHERE STATUS = 'ACTIVE'")) {
+            try (
+                    ResultSet rs3 = pstmt.executeQuery(
+                            "SELECT COUNT(*) AS active_count FROM V$SESSION WHERE STATUS = 'ACTIVE'")) {
                 if (rs3.next()) {
                     monitorRecord.setThreadsRunningConnections(rs3.getLong("active_count"));
                 }
