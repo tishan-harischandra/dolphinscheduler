@@ -1,0 +1,176 @@
+CREATE OR REPLACE PROCEDURE drop_table_if_exists(p_tab IN VARCHAR2) IS
+  e_tab_missing  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_tab_missing, -942);
+BEGIN
+EXECUTE IMMEDIATE
+    'DROP TABLE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_tab),FALSE)||' PURGE';
+EXCEPTION
+  WHEN e_tab_missing THEN NULL;               -- swallow “table not found”
+END;
+
+CREATE OR REPLACE PROCEDURE drop_seq_if_exists(p_seq IN VARCHAR2) IS
+  e_seq_missing  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_seq_missing, -2289);
+BEGIN
+EXECUTE IMMEDIATE
+    'DROP SEQUENCE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_seq),FALSE);
+EXCEPTION
+  WHEN e_seq_missing THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE drop_index_if_exists(p_idx IN VARCHAR2) IS
+  e_idx_missing  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_idx_missing, -1418);
+BEGIN
+EXECUTE IMMEDIATE
+    'DROP INDEX '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_idx),FALSE);
+EXCEPTION
+  WHEN e_idx_missing THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE drop_constraint_if_exists(p_tab IN VARCHAR2, p_con IN VARCHAR2) IS
+  e_con_missing  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_con_missing, -2443);
+BEGIN
+EXECUTE IMMEDIATE
+    'ALTER TABLE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_tab),FALSE)||
+    ' DROP CONSTRAINT '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_con),FALSE);
+EXCEPTION
+  WHEN e_con_missing THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE create_table_if_not_exists(p_tab IN VARCHAR2, p_sql IN CLOB) IS
+  e_tab_exists  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_tab_exists, -955);
+BEGIN
+EXECUTE IMMEDIATE p_sql;
+EXCEPTION
+  WHEN e_tab_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE add_column_if_not_exists(p_tab IN VARCHAR2, p_col IN VARCHAR2, p_def IN VARCHAR2) IS
+  e_col_exists  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_col_exists, -1430);
+BEGIN
+EXECUTE IMMEDIATE
+    'ALTER TABLE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_tab),FALSE)||
+    ' ADD ('||p_def||')';
+EXCEPTION
+  WHEN e_col_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE create_index_if_not_exists(p_idx IN VARCHAR2, p_sql IN CLOB) IS
+  e_idx_exists  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_idx_exists, -955);
+BEGIN
+EXECUTE IMMEDIATE p_sql;
+EXCEPTION
+  WHEN e_idx_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE add_constraint_if_not_exists(p_tab IN VARCHAR2, p_con IN VARCHAR2, p_sql IN CLOB) IS
+  e_con_exists  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_con_exists, -2264);
+BEGIN
+EXECUTE IMMEDIATE p_sql;
+EXCEPTION
+  WHEN e_con_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE drop_column_if_exists (
+  p_tab IN VARCHAR2,
+  p_col IN VARCHAR2
+) IS
+  e_col_missing  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_col_missing, -904);
+
+  e_col_not_droppable  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_col_not_droppable, -1749);
+BEGIN
+EXECUTE IMMEDIATE
+    'ALTER TABLE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_tab),FALSE)||
+    ' DROP COLUMN '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_col),FALSE);
+
+EXCEPTION
+  WHEN e_col_missing
+     OR e_col_not_droppable
+  THEN
+     NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE drop_sequence_if_exists (p_seq_name IN VARCHAR2) IS
+  e_seq_missing  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(e_seq_missing, -2289);
+BEGIN
+EXECUTE IMMEDIATE
+    'DROP SEQUENCE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_seq_name),FALSE);
+EXCEPTION
+  WHEN e_seq_missing THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE rename_table_if_exists (p_old  IN VARCHAR2, p_new  IN VARCHAR2) IS
+  e_old_missing  EXCEPTION;  PRAGMA EXCEPTION_INIT(e_old_missing, -942);
+  e_new_exists   EXCEPTION;  PRAGMA EXCEPTION_INIT(e_new_exists, -955);
+BEGIN
+EXECUTE IMMEDIATE
+    'ALTER TABLE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_old),FALSE)||
+    ' RENAME TO '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_new),FALSE);
+EXCEPTION
+  WHEN e_old_missing OR e_new_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE create_sequence_if_not_exists (p_seq  IN VARCHAR2, p_sql  IN CLOB) IS
+  e_seq_exists  EXCEPTION; PRAGMA EXCEPTION_INIT(e_seq_exists, -955);
+BEGIN
+EXECUTE IMMEDIATE p_sql;
+EXCEPTION
+  WHEN e_seq_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE rename_column_if_exists (p_tab IN VARCHAR2, p_old IN VARCHAR2, p_new IN VARCHAR2) IS
+  e_col_missing  EXCEPTION;  PRAGMA EXCEPTION_INIT(e_col_missing, -904);
+  e_col_exists   EXCEPTION;  PRAGMA EXCEPTION_INIT(e_col_exists , -1430);
+BEGIN
+EXECUTE IMMEDIATE
+    'ALTER TABLE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_tab),FALSE) ||
+    ' RENAME COLUMN '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_old),FALSE) ||
+    ' TO '           ||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_new),FALSE);
+EXCEPTION
+  WHEN e_col_missing OR e_col_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE rename_index_if_exists (p_old IN VARCHAR2, p_new IN VARCHAR2) IS
+  e_missing  EXCEPTION; PRAGMA EXCEPTION_INIT(e_missing, -1418);  -- index not found
+  e_exists   EXCEPTION; PRAGMA EXCEPTION_INIT(e_exists , -955);   -- name already used
+BEGIN
+EXECUTE IMMEDIATE
+    'ALTER INDEX '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_old),FALSE)||
+    ' RENAME TO ' ||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_new),FALSE);
+EXCEPTION
+  WHEN e_missing OR e_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE rename_sequence_if_exists (p_old IN VARCHAR2, p_new IN VARCHAR2) IS
+  e_missing  EXCEPTION; PRAGMA EXCEPTION_INIT(e_missing, -2289);  -- seq not found
+  e_exists   EXCEPTION; PRAGMA EXCEPTION_INIT(e_exists , -955);   -- name already used
+BEGIN
+EXECUTE IMMEDIATE
+    'RENAME '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_old),FALSE)||
+    ' TO '   ||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_new),FALSE);
+EXCEPTION
+  WHEN e_missing OR e_exists THEN NULL;
+END;
+
+CREATE OR REPLACE PROCEDURE rename_constraint_if_exists (p_tab IN VARCHAR2, p_old IN VARCHAR2, p_new IN VARCHAR2) IS
+  e_missing  EXCEPTION; PRAGMA EXCEPTION_INIT(e_missing, -2443);  -- constraint not found
+  e_exists   EXCEPTION; PRAGMA EXCEPTION_INIT(e_exists , -2264);  -- name already used
+BEGIN
+EXECUTE IMMEDIATE
+    'ALTER TABLE '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_tab),FALSE)||
+    ' RENAME CONSTRAINT '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_old),FALSE)||
+    ' TO '||DBMS_ASSERT.ENQUOTE_NAME(UPPER(p_new),FALSE);
+EXCEPTION
+  WHEN e_missing OR e_exists THEN NULL;
+END;
+
+SHOW ERRORS
