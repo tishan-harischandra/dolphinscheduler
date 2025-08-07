@@ -20,32 +20,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler</artifactId>
+        <artifactId>dolphinscheduler-dao-plugin</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dolphinscheduler-dao-plugin</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dolphinscheduler-dao-oracle</artifactId>
 
-    <modules>
-        <module>dolphinscheduler-dao-api</module>
-        <module>dolphinscheduler-dao-plugin-all</module>
-        <module>dolphinscheduler-dao-h2</module>
-        <module>dolphinscheduler-dao-mysql</module>
-        <module>dolphinscheduler-dao-oracle</module>
-        <module>dolphinscheduler-dao-postgresql</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-dao-api</artifactId>
+        </dependency>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
