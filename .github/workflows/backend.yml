@@ -118,6 +118,10 @@ jobs:
             script: .github/workflows/cluster-test/postgresql_with_zookeeper_registry/start-job.sh
           - name: cluster-test-postgresql-with-postgresql-registry
             script: .github/workflows/cluster-test/postgresql_with_postgresql_registry/start-job.sh
+          - name: cluster-test-oracle-zookeeper-registry
+            script: .github/workflows/cluster-test/oracle_with_zookeeper_registry/start-job.sh
+          - name: cluster-test-postgresql-with-oracle-registry
+            script: .github/workflows/cluster-test/oracle_with_oracle_registry/start-job.sh
     steps:
       - uses: actions/checkout@v4
         with:
@@ -149,6 +153,8 @@ jobs:
             script: .github/workflows/schema-check/mysql/start-job.sh
           - name: schema-check-with-postgresql
             script: .github/workflows/schema-check/postgresql/start-job.sh
+          - name: schema-check-with-oracle
+            script: .github/workflows/schema-check/oracle/start-job.sh
     steps:
       - uses: actions/checkout@v4
         with:

@@ -21,7 +21,32 @@ set -euox pipefail
 USER=root
 
 #Create database
-mysql -hmysql -P3306 -uroot -p123456 -e "CREATE DATABASE IF NOT EXISTS dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
+sqlplus -S system/oracle@//oracle:1521/ORCL <<'EOF'
+WHENEVER SQLERROR EXIT 1
+
+DECLARE
+  v_cnt INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO v_cnt
+  FROM   dba_users
+  WHERE  username = 'DOLPHINSCHEDULER';
+
+  IF v_cnt = 0 THEN
+    EXECUTE IMMEDIATE q'[
+      CREATE USER dolphinscheduler
+        IDENTIFIED BY "123456"
+        DEFAULT TABLESPACE users
+        TEMPORARY TABLESPACE temp
+        QUOTA UNLIMITED ON users
+    ]';
+
+    -- give it the basic privileges you’d expect for an application schema
+    EXECUTE IMMEDIATE 'GRANT CONNECT, RESOURCE, CREATE SESSION TO dolphinscheduler';
+  END IF;
+END;
+/
+EXIT
+EOF
 
 #Sudo
 sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers

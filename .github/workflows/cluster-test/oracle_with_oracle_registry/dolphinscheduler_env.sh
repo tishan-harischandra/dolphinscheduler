@@ -22,7 +22,7 @@ export JAVA_HOME=${JAVA_HOME:-/opt/java/openjdk}
 export DATABASE=${DATABASE:-oracle}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_URL="jdbc:oracle:thin:@oracle:1521/dolphinscheduler"
-export SPRING_DATASOURCE_USERNAME=root
+export SPRING_DATASOURCE_USERNAME=dolphinscheduler
 export SPRING_DATASOURCE_PASSWORD=123456
 
 # DolphinScheduler server related configuration

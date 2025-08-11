@@ -37,3 +37,7 @@ services:
       interval: 5s
       timeout: 60s
       retries: 120
+
+networks:
+  schema-test:
+    name: schema-test
